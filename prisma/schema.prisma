@@ -29,7 +29,7 @@ model Menu {
   product     String
   description String
   price       Float
-  table     Table[]
+  table       Table[]
   user        User[]
   createAt    DateTime @default(now())
   updateAt    DateTime @updatedAt()

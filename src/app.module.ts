@@ -5,7 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { TableModule } from './table/table.module';
 
 @Module({
-  imports: [UserModule, TableModule, MenuModule, AuthModule, TableModule],
+  imports: [UserModule, TableModule, MenuModule, AuthModule],
   controllers: [],
   providers: [],
 })

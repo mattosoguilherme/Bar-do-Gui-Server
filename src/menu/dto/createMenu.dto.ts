@@ -13,7 +13,7 @@ export class CreateMenuDto {
     @ApiProperty()
     title: string;
 
-    // @IsUrl()
+
     @IsString()
     @IsNotEmpty()
     @ApiProperty()

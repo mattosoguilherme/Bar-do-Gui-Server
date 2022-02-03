@@ -23,7 +23,7 @@ export class MenuService {
         price: price,
         product: product,
         description: description,
-        table: { connect: { id: userId } },
+        user:{ connect: { id: userId }}
       },
     });
 
@@ -55,18 +55,18 @@ export class MenuService {
     return updatedItem;
   }
 
-  async delete(user:User, table: Table) {
-    const {numberTable } = table;
-    const {menuId} = user 
+  async delete(itemId:string) {
+  
+    const tableMany = await this.prismaService.table.findMany()
 
-    if (table.menuId === menuId) {
-      throw new ConflictException(
-        `Não é possivel deletar produto, pois, a mesa ${numberTable} está aguardando o mesmo.`,
-      );
-    }
+    tableMany.map( t => {
+      if(itemId === t.menuId){
+        throw new ConflictException( `Não é possivel deletar produto, pois, alguma mesa está aguardando o mesmo.`)
+      }
+    })
 
     const deleteItemMenu = await this.prismaService.menu.delete({
-      where: { id: menuId },
+      where: { id: itemId },
     });
     return deleteItemMenu;
   }

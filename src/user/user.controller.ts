@@ -17,13 +17,12 @@ import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { LoggedUser } from 'src/auth/loggedUser.decoretor';
 
-@ApiTags()
+@ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'cria um usuário' })
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.userService.create(createUserDto);
@@ -56,7 +55,7 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Deletar o usuário autenticado' })
-  delete(@LoggedUser() user: User) {
+  delete(@LoggedUser() user: User): Promise<User> {
     return this.userService.delete(user.id);
   }
 }

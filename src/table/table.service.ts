@@ -31,10 +31,24 @@ export class TableService {
 
   async delete(tableId: string): Promise<Table> {
 
-    const table = await this.validator.findTableId(tableId)
+    await this.validator.findTableId(tableId)
     
-    await this.prismaService.table.delete({ where: { id: tableId } });
+    const tableDeleted = await this.prismaService.table.delete({ where: { id: tableId } });
 
-    return;
+    return tableDeleted;
   }
+
+  async findMany():Promise<Table[]> {
+    const tableMany = await this.prismaService.table.findMany()
+    return tableMany;
+  }
+
+  async findUnique(tableId:string): Promise<Table>{
+
+    const tableFinded = await this.validator.findTableId(tableId)
+
+    return tableFinded; 
+  }
+
+
 }

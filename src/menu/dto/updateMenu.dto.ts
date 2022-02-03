@@ -4,7 +4,7 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl } from "class-validat
 export class UpdateMenuDto {
 
     @IsOptional()
-    @IsString()
+    @IsNumber()
     @IsNotEmpty()
     @ApiProperty()
     stock:number;
@@ -19,7 +19,6 @@ export class UpdateMenuDto {
     @IsOptional()
     @IsString()
     @IsNotEmpty()
-    @IsUrl()
     imgUrl: string;
 
     @ApiProperty()

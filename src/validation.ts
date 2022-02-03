@@ -31,8 +31,6 @@ export class Validator {
     if (!itemMenu) {
       throw new NotFoundException('Item do menu não encontrado');
     }
-
-    console.log(itemMenu);
     return itemMenu;
   }
 

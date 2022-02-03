@@ -39,23 +39,23 @@ export class MenuController {
     return this.menuService.findUnique(itemId)
   }
 
-  @Patch()
+  @Patch(":id")
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Atualizar produto do menu' })
   update(
-    @LoggedUser() item: Menu,
+    @Param('id') itemId: string,
     @Body() updateMenuDto: UpdateMenuDto,
   ): Promise<Menu> {
-    return this.menuService.update(item.id, updateMenuDto);
+    return this.menuService.update(itemId, updateMenuDto);
   }
 
-  @Delete()
+  @Delete(':id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Deletar produto do menu'})
-  delete(@LoggedUser() user:User, table: Table){
+  delete(@Param('id') itemId:string):Promise<Menu>{
 
-    return this.menuService.delete(user, table)
+    return this.menuService.delete(itemId)
   }
 }
