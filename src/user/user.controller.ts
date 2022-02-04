@@ -19,6 +19,7 @@ import { LoggedUser } from 'src/auth/decorators/loggedUser.decoretor';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/utils/roles.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { UpdateUserPasswordDto } from './dto/updateUserPassword.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -62,5 +63,14 @@ export class UserController {
   @ApiOperation({ summary: 'Deletar o usuário autenticado' })
   delete(@LoggedUser() user: User): Promise<User> {
     return this.userService.delete(user.id);
+  }
+
+  @Patch("/update/:id")
+  @ApiOperation({ summary: 'Atualizar senha de qualquer usuário pelo Id. Acesso apenas ao ADMIN'})
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard(), RolesGuard)
+  @ApiBearerAuth()
+  updateUserPassword(@Param('id') user:User,@Body() updateUserPasswordDto: UpdateUserPasswordDto):Promise<User>{
+    return this.userService.updateUserPassword(user.id,updateUserPasswordDto)
   }
 }

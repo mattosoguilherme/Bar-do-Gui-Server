@@ -6,6 +6,7 @@ import { User } from '@prisma/client';
 import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { Validator } from 'src/validation';
+import { UpdateUserPasswordDto } from './dto/updateUserPassword.dto';
 
 @Injectable()
 export class UserService {
@@ -43,7 +44,7 @@ export class UserService {
   async findMany(): Promise<UserDto[]> {
     const users = await this.prismaService.user.findMany({
       select: {
-        role:true,
+        role: true,
         id: true,
         name: true,
         email: true,
@@ -66,8 +67,6 @@ export class UserService {
 
     await this.validator.findUserId(userId);
 
-    // await this.validator.validatingEmail(email);
-
     if (email) {
       const emailExisting = await this.prismaService.user.findUnique({
         where: { email: email },
@@ -89,6 +88,32 @@ export class UserService {
 
     delete updatedUser.password;
     return updatedUser;
+  }
+
+  async updateUserPassword(
+    userId: string,
+    updateUserPasswordDto: UpdateUserPasswordDto,
+  ): Promise<User> {
+    const user = await this.validator.findUserId(userId);
+    const { password, newPassword, newPasswordConfirmation } =
+      updateUserPasswordDto;
+
+    if (newPassword != newPasswordConfirmation) {
+      throw new ConflictException('Senhas não conferem.');
+    }
+
+    if (password != user.password) {
+      throw new ConflictException('Senha incorreta, digite novamente.');
+    }
+
+    const userPasswordUpdated = await this.prismaService.user.update({
+      where: { id: user.id },
+      data: {
+        password: newPassword,
+      },
+    });
+
+    return userPasswordUpdated;
   }
 
   async delete(userId: string): Promise<User> {
