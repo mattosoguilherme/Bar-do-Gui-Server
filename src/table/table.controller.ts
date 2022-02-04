@@ -71,6 +71,6 @@ export class TableController {
     @Body() updateUserTable: UpdateUserTableDto,
     @LoggedUser() userId: User,
   ) {
-    return this.tableService.updateUserTable(tableId, updateUserTable, userId);
+    return this.tableService.updateUserTable(tableId, updateUserTable, userId.id);
   }
 }

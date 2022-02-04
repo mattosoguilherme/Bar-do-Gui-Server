@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Table } from '@prisma/client';
+import { Table, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Validator } from 'src/validation';
 import { CreateTableDto } from './dto/createTable.dto';
@@ -35,7 +35,16 @@ export class TableService {
   }
 
   async findMany(): Promise<Table[]> {
-    const tableMany = await this.prismaService.table.findMany();
+    const tableMany = await this.prismaService.table.findMany({
+      select: {
+        id: true,
+        product: { select: { Menu: true } },
+        user: true,
+        observation: true,
+        numberTable: true,
+      },
+    });
+
     return tableMany;
   }
 
@@ -48,7 +57,7 @@ export class TableService {
   async updateUserTable(
     tableId: string,
     updateUserTable: UpdateUserTableDto,
-    userId,
+    userId: string,
   ) {
     const { disconnect } = updateUserTable;
 

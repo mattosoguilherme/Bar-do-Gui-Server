@@ -12,5 +12,5 @@ export class UpdateOrderDto {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  itemId: string;
+  menuId: string;
 }

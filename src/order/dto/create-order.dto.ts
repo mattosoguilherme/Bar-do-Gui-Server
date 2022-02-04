@@ -10,5 +10,5 @@ export class CreateOrderDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  itemId: string;
+  menuId: string;
 }
