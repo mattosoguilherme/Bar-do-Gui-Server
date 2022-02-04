@@ -61,16 +61,4 @@ export class TableController {
     return this.tableService.findUnique(tableId);
   }
 
-  @Patch(':id')
-  @Roles(Role.ADMIN, Role.USER)
-  @UseGuards(AuthGuard(),RolesGuard)
-  @ApiOperation({ summary: 'Alterar usuários da mesa pelo ID' })
-  @ApiBearerAuth()
-  updateUserTable(
-    @Param('id') tableId: string,
-    @Body() updateUserTable: UpdateUserTableDto,
-    @LoggedUser() userId: User,
-  ) {
-    return this.tableService.updateUserTable(tableId, updateUserTable, userId.id);
-  }
 }

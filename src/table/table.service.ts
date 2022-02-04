@@ -54,27 +54,4 @@ export class TableService {
     return tableFinded;
   }
 
-  async updateUserTable(
-    tableId: string,
-    updateUserTable: UpdateUserTableDto,
-    userId: string,
-  ) {
-    const { disconnect } = updateUserTable;
-
-    await this.validator.findTableId(tableId);
-
-    if (disconnect === true) {
-      return await this.prismaService.table.update({
-        where: { id: tableId },
-        data: { user: { disconnect: { id: userId } } },
-        include: { product: { select: { Menu: true } }, user: true },
-      });
-    }
-
-    return await this.prismaService.table.update({
-      where: { id: tableId },
-      data: { user: { connect: { id: userId } } },
-      include: { product: { select: { Menu: true } }, user: true },
-    });
-  }
 }
