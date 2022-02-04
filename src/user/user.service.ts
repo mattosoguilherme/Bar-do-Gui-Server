@@ -18,8 +18,13 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const { email, password, passwordConfirmation } = createUserDto;
+    const { password_sistem ,role ,email, password, passwordConfirmation } = createUserDto;
 
+    if (role === Role.ADMIN) {
+      if(password_sistem != env.PASSWORD_SISTEM){
+        throw new ConflictException('Senha do sistema está incorreta.')
+      }
+    }
     await this.validator.validatingEmail(email);
 
     if (password !== passwordConfirmation) {
@@ -106,7 +111,7 @@ export class UserService {
 
     if (role === Role.ADMIN) {
       if(password_sistem != env.PASSWORD_SISTEM){
-        throw new ConflictException('Senha do sistema incorreta')
+        throw new ConflictException('Senha do sistema está incorreta.')
       }
     }
 
@@ -118,7 +123,7 @@ export class UserService {
       throw new ConflictException('Senha incorreta, digite novamente.');
     }
 
-    const userPasswordUpdated = await this.prismaService.user.update({
+    const credentialsUpdated = await this.prismaService.user.update({
       where: { id: user.id },
       data: {
         password: newPassword,
@@ -126,7 +131,7 @@ export class UserService {
       },
     });
 
-    return userPasswordUpdated;
+    return credentialsUpdated;
   }
 
   async delete(userId: string): Promise<User> {
