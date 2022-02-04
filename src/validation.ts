@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Menu, Table, User } from '@prisma/client';
+import { Menu, Table, User, Order } from '@prisma/client';
 import { PrismaService } from './prisma.service';
 
 @Injectable()
@@ -69,5 +69,18 @@ export class Validator {
     }
 
     return tableFinded;
+  }
+
+  async orderValid(id: string): Promise<Order> {
+
+    const orderFinded = await this.prismaService.order.findUnique({
+      where: { id: id },
+      include: {Table: true, Menu: true}
+    });
+
+    if(!orderFinded.id){
+      throw new NotFoundException('Pedido não encontrado')
+    }
+    return orderFinded
   }
 }

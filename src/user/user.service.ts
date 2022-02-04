@@ -1,7 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-} from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto } from './dto/createUser.dto';
 import * as bcrypt from 'bcrypt';
@@ -35,12 +32,13 @@ export class UserService {
         ...createUserDto,
         password: hashedPassword,
       },
+      include: { Table: true },
     });
 
     delete createUserDto.password;
 
     return createdUser;
-  }   
+  }
 
   async findMany(): Promise<UserDto[]> {
     const users = await this.prismaService.user.findMany({
@@ -63,16 +61,18 @@ export class UserService {
   }
 
   async update(userId: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const { name, email } = updateUserDto;
+    const { name, email, role } = updateUserDto;
 
     await this.validator.findUserId(userId);
 
     // await this.validator.validatingEmail(email);
 
-    if(email){
-      const emailExisting = await this.prismaService.user.findUnique({where:{email:email}})
-      if(emailExisting){
-        throw new ConflictException("email já cadastrado")
+    if (email) {
+      const emailExisting = await this.prismaService.user.findUnique({
+        where: { email: email },
+      });
+      if (emailExisting) {
+        throw new ConflictException('email já cadastrado');
       }
     }
 
@@ -81,7 +81,9 @@ export class UserService {
       data: {
         email: email,
         name: name,
+        role: role,
       },
+      include: { Table: true },
     });
 
     delete updatedUser.password;
@@ -93,6 +95,7 @@ export class UserService {
 
     const deletedUser = await this.prismaService.user.delete({
       where: { id: userId },
+      include: { Table: true },
     });
 
     delete deletedUser.password;
