@@ -19,7 +19,6 @@ export class Validator {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    console.log(user);
     return user;
   }
 
@@ -44,7 +43,6 @@ export class Validator {
         ' Email já cadastrado! Tente outro por gentileza.',
       );
     }
-
     console.log(emailValid);
     return emailValid;
   }
@@ -58,7 +56,6 @@ export class Validator {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    console.log(idUser);
     return idUser;
   }
 

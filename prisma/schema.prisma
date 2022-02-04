@@ -7,33 +7,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+enum Role {
+  USER
+  ADMIN
+}
 
+model User {
   id       String   @id @default(uuid())
   name     String
   email    String   @unique
   password String
-  table    Table[]
+  role     Role     @default(USER)
   createAt DateTime @default(now())
-  updateAt DateTime @updatedAt
-  Menu     Menu?    @relation(fields: [menuId], references: [id])
-  menuId   String?
+  updateAt DateTime @updatedAt()
+  Table    Table?   @relation(fields: [tableId], references: [id])
+  tableId  String?
+
   @@map("user")
 }
 
 model Menu {
   id          String   @id @default(uuid())
-  stock       Int
   title       String
   imgUrl      String
   product     String
   description String
   price       Float
-  table       Table[]
-  user        User[]
   createAt    DateTime @default(now())
   updateAt    DateTime @updatedAt()
-
+  tables      Order[]
 
   @@map("menu")
 }
@@ -41,12 +43,21 @@ model Menu {
 model Table {
   id          String  @id @default(uuid())
   numberTable Int     @default(autoincrement())
-  observation String
-  User        User?   @relation(fields: [userId], references: [id])
-  userId      String?
-  Menu        Menu?   @relation(fields: [menuId], references: [id])
-  menuId      String?
-  
+  product     Order[]
+  user        User[]
+  observation String  @default("")
 
   @@map("table")
+}
+
+model Order {
+  id       String   @id @default(uuid())
+  Menu     Menu?    @relation(fields: [menuId], references: [id])
+  menuId   String?
+  Table    Table?   @relation(fields: [tableId], references: [id])
+  tableId  String?
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt()
+
+  @@map("order")
 }

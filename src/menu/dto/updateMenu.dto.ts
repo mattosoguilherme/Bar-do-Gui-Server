@@ -3,11 +3,6 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl } from "class-validat
 
 export class UpdateMenuDto {
 
-    @IsOptional()
-    @IsNumber()
-    @IsNotEmpty()
-    @ApiProperty()
-    stock:number;
 
     @IsOptional()
     @IsString()

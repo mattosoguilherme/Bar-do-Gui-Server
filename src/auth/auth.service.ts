@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginInputDto } from './dto/loginInput.dto';
 import { LoginResponseDto } from './dto/loginResponse.dto';
@@ -26,6 +26,7 @@ export class AuthService {
     }
 
     delete userValid.password
+
 
     return {
         token: this.jwtService.sign({email}),

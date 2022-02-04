@@ -4,8 +4,11 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginInputDto } from './dto/loginInput.dto';
 import { LoginResponseDto } from './dto/loginResponse.dto';
-import { LoggedUser } from './loggedUser.decoretor';
+import { LoggedUser } from './decorators/loggedUser.decoretor';
 import { User } from '@prisma/client';
+import { Role } from 'src/utils/roles.enum';
+import { Roles } from './decorators/roles.decorator';
+import { RolesGuard } from './guards/roles.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -19,7 +22,8 @@ export class AuthController {
   }
 
   @Get()
-  @UseGuards(AuthGuard())
+  @Roles(Role.USER,Role.ADMIN)
+  @UseGuards(AuthGuard(), RolesGuard)
   @ApiOperation({ summary: 'Usuário logado com sucesso!' })
   @ApiBearerAuth()
   me(@LoggedUser() user: User) {

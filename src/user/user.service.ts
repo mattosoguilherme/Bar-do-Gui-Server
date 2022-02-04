@@ -64,9 +64,17 @@ export class UserService {
 
   async update(userId: string, updateUserDto: UpdateUserDto): Promise<User> {
     const { name, email } = updateUserDto;
+
     await this.validator.findUserId(userId);
 
-    await this.validator.validatingEmail(email);
+    // await this.validator.validatingEmail(email);
+
+    if(email){
+      const emailExisting = await this.prismaService.user.findUnique({where:{email:email}})
+      if(emailExisting){
+        throw new ConflictException("email já cadastrado")
+      }
+    }
 
     const updatedUser = await this.prismaService.user.update({
       where: { id: userId },

@@ -2,7 +2,10 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@n
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Menu, Table, User } from '@prisma/client';
-import { LoggedUser } from 'src/auth/loggedUser.decoretor';
+import { LoggedUser } from 'src/auth/decorators/loggedUser.decoretor';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Role } from 'src/utils/roles.enum';
 import { CreateMenuDto } from './dto/createMenu.dto';
 import { UpdateMenuDto } from './dto/updateMenu.dto';
 import { MenuService } from './menu.service';
@@ -13,14 +16,15 @@ export class MenuController {
   constructor(private readonly menuService: MenuService) {}
 
   @Post()
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Criar um produto.' })
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard(),RolesGuard)
   @ApiBearerAuth()
   create(
     @Body() createMenuDto: CreateMenuDto,
     @LoggedUser() user: User,
   ): Promise<Menu> {
-    return this.menuService.create(createMenuDto, user.id);
+    return this.menuService.create(createMenuDto);
   }
 
   @Get()
@@ -40,8 +44,9 @@ export class MenuController {
   }
 
   @Patch(":id")
+  @Roles(Role.ADMIN)
   @ApiBearerAuth()
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard(), RolesGuard)
   @ApiOperation({ summary: 'Atualizar produto do menu' })
   update(
     @Param('id') itemId: string,
@@ -51,8 +56,9 @@ export class MenuController {
   }
 
   @Delete(':id')
+  @Roles(Role.ADMIN)
   @ApiBearerAuth()
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard(), RolesGuard)
   @ApiOperation({ summary: 'Deletar produto do menu'})
   delete(@Param('id') itemId:string):Promise<Menu>{
 

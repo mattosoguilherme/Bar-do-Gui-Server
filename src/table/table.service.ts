@@ -3,6 +3,7 @@ import { Table } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Validator } from 'src/validation';
 import { CreateTableDto } from './dto/createTable.dto';
+import { UpdateUserTableDto } from './dto/updateUser.dto';
 
 @Injectable()
 export class TableService {
@@ -11,44 +12,60 @@ export class TableService {
     private validator: Validator,
   ) {}
 
-  async create(
-    createTableDto: CreateTableDto,
-    userId: string,
-  ): Promise<Table> {
-    const { observation,menuItem } = createTableDto;
-
-    await this.validator.findItemId(menuItem)
+  async create(createTableDto: CreateTableDto): Promise<Table> {
+    const { observation } = createTableDto;
 
     const createdTable = await this.prismaService.table.create({
-      data: {
-        observation: observation,
-        User: { connect: { id: userId } },
-        Menu: { connect: { id: menuItem } },
-      },
+      data: { observation: observation },
+      include: { product: { select: { Menu: true } }, user: true },
     });
+
     return createdTable;
   }
 
   async delete(tableId: string): Promise<Table> {
+    await this.validator.findTableId(tableId);
 
-    await this.validator.findTableId(tableId)
-    
-    const tableDeleted = await this.prismaService.table.delete({ where: { id: tableId } });
+    const tableDeleted = await this.prismaService.table.delete({
+      where: { id: tableId },
+      include: { product: { select: { Menu: true } } },
+    });
 
     return tableDeleted;
   }
 
-  async findMany():Promise<Table[]> {
-    const tableMany = await this.prismaService.table.findMany()
+  async findMany(): Promise<Table[]> {
+    const tableMany = await this.prismaService.table.findMany();
     return tableMany;
   }
 
-  async findUnique(tableId:string): Promise<Table>{
+  async findUnique(tableId: string): Promise<Table> {
+    const tableFinded = await this.validator.findTableId(tableId);
 
-    const tableFinded = await this.validator.findTableId(tableId)
-
-    return tableFinded; 
+    return tableFinded;
   }
 
+  async updateUserTable(
+    tableId: string,
+    updateUserTable: UpdateUserTableDto,
+    userId,
+  ) {
+    const { disconnect } = updateUserTable;
 
+    await this.validator.findTableId(tableId);
+
+    if (disconnect === true) {
+      return await this.prismaService.table.update({
+        where: { id: tableId },
+        data: { user: { disconnect: { id: userId } } },
+        include: { product: { select: { Menu: true } }, user: true },
+      });
+    }
+
+    return await this.prismaService.table.update({
+      where: { id: tableId },
+      data: { user: { connect: { id: userId } } },
+      include: { product: { select: { Menu: true } }, user: true },
+    });
+  }
 }

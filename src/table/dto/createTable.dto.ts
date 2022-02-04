@@ -6,9 +6,4 @@ export class CreateTableDto {
     @IsNotEmpty()
     @ApiProperty()
     observation: string
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    menuItem:string
 }

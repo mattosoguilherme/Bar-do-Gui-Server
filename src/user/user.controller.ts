@@ -15,7 +15,10 @@ import { UpdateUserDto } from './dto/updateUser.dto';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
-import { LoggedUser } from 'src/auth/loggedUser.decoretor';
+import { LoggedUser } from 'src/auth/decorators/loggedUser.decoretor';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/utils/roles.enum';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @ApiTags('user')
 @Controller('user')
@@ -41,8 +44,9 @@ export class UserController {
   }
 
   @Patch()
+  @Roles(Role.USER,Role.ADMIN)
   @ApiBearerAuth()
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard(),RolesGuard)
   @ApiOperation({ summary: 'Atualializar o usuário autenticado' })
   update(
     @LoggedUser() user: User,
@@ -53,7 +57,8 @@ export class UserController {
 
   @Delete()
   @ApiBearerAuth()
-  @UseGuards(AuthGuard())
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard(),RolesGuard)
   @ApiOperation({ summary: 'Deletar o usuário autenticado' })
   delete(@LoggedUser() user: User): Promise<User> {
     return this.userService.delete(user.id);
