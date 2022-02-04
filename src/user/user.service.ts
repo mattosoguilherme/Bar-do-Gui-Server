@@ -6,7 +6,9 @@ import { User } from '@prisma/client';
 import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { Validator } from 'src/validation';
-import { UpdateUserPasswordDto } from './dto/updateUserPassword.dto';
+import { UpdateCredentialsDto } from './dto/updateCredentials.dto';
+import { Role } from 'src/utils/roles.enum';
+import { env } from 'process';
 
 @Injectable()
 export class UserService {
@@ -63,7 +65,7 @@ export class UserService {
   }
 
   async update(userId: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const { name, email, role } = updateUserDto;
+    const { name, email } = updateUserDto;
 
     await this.validator.findUserId(userId);
 
@@ -81,7 +83,6 @@ export class UserService {
       data: {
         email: email,
         name: name,
-        role: role,
       },
       include: { Table: true },
     });
@@ -90,13 +91,24 @@ export class UserService {
     return updatedUser;
   }
 
-  async updateUserPassword(
+  async updateCredentials(
     userId: string,
-    updateUserPasswordDto: UpdateUserPasswordDto,
+    updateCredentials: UpdateCredentialsDto,
   ): Promise<User> {
     const user = await this.validator.findUserId(userId);
-    const { password, newPassword, newPasswordConfirmation } =
-      updateUserPasswordDto;
+    const {
+      password_sistem,
+      role,
+      password,
+      newPassword,
+      newPasswordConfirmation,
+    } = updateCredentials;
+
+    if (role === Role.ADMIN) {
+      if(password_sistem != env.PASSWORD_SISTEM){
+        throw new ConflictException('Senha do sistema incorreta')
+      }
+    }
 
     if (newPassword != newPasswordConfirmation) {
       throw new ConflictException('Senhas não conferem.');
@@ -110,6 +122,7 @@ export class UserService {
       where: { id: user.id },
       data: {
         password: newPassword,
+        role: role,
       },
     });
 

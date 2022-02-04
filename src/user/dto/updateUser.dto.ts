@@ -16,9 +16,4 @@ export class UpdateUserDto {
   @ApiProperty()
   name: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ default: 'USER' })
-  @IsOptional()
-  role: Role;
 }
