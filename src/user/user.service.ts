@@ -35,6 +35,8 @@ export class UserService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    delete createUserDto.password_sistem;
+
     const createdUser = await this.prismaService.user.create({
       data: {
         ...createUserDto,
