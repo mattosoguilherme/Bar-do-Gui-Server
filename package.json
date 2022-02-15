@@ -1,6 +1,9 @@
 {
   "name": "backend",
   "version": "0.0.1",
+  "engines": {
+    "node": "14.17.5"
+  },
   "description": "",
   "author": "",
   "private": true,
