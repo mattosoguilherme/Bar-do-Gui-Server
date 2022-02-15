@@ -8,7 +8,6 @@ import { UpdateUserDto } from './dto/updateUser.dto';
 import { Validator } from 'src/validation';
 import { UpdateCredentialsDto } from './dto/updateCredentials.dto';
 import { Role } from 'src/utils/roles.enum';
-import { env } from 'process';
 
 @Injectable()
 export class UserService {
@@ -21,7 +20,7 @@ export class UserService {
     const { password_sistem ,role ,email, password, passwordConfirmation } = createUserDto;
 
     if (role === Role.ADMIN) {
-      if(password_sistem != env.PASSWORD_SISTEM){
+      if(password_sistem != process.env.PASSWORD_SISTEM){
         throw new ConflictException('Senha do sistema está incorreta.')
       }
     }
@@ -112,7 +111,7 @@ export class UserService {
     } = updateCredentials;
 
     if (role === Role.ADMIN) {
-      if(password_sistem != env.PASSWORD_SISTEM){
+      if(password_sistem != process.env.PASSWORD_SISTEM){
         throw new ConflictException('Senha do sistema está incorreta.')
       }
     }
