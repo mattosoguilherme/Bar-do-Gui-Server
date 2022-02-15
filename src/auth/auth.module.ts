@@ -12,7 +12,7 @@ import { RolesGuard } from './guards/roles.guard';
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_PASSWORD,
+      secret: "senha123",
       signOptions: { expiresIn: '6h' },
     }),
   ],
