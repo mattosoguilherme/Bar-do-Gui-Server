@@ -120,7 +120,9 @@ export class UserService {
       throw new ConflictException('Senhas não conferem.');
     }
 
-    if (password != user.password) {
+    const hashValid = await bcrypt.compare(password,user.password)
+
+    if (!hashValid) {
       throw new ConflictException('Senha incorreta, digite novamente.');
     }
 
