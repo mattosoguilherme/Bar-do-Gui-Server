@@ -134,6 +134,7 @@ export class UserService {
       },
     });
 
+    delete credentialsUpdated.password;
     return credentialsUpdated;
   }
 
