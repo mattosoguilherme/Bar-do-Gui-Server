@@ -11,7 +11,7 @@ export class UpdateCredentialsDto {
 
     @IsString()
     @IsNotEmpty()
-    @ApiProperty()
+    @ApiProperty({ default: 'USER' })
     @IsOptional()
     role: Role;
 

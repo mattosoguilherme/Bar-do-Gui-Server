@@ -45,9 +45,9 @@ export class UserController {
   }
 
   @Patch()
-  @Roles(Role.USER,Role.ADMIN)
+  @Roles(Role.USER, Role.ADMIN)
   @ApiBearerAuth()
-  @UseGuards(AuthGuard(),RolesGuard)
+  @UseGuards(AuthGuard(), RolesGuard)
   @ApiOperation({ summary: 'Atualializar o usuário autenticado' })
   update(
     @LoggedUser() user: User,
@@ -59,18 +59,24 @@ export class UserController {
   @Delete()
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
-  @UseGuards(AuthGuard(),RolesGuard)
+  @UseGuards(AuthGuard(), RolesGuard)
   @ApiOperation({ summary: 'Deletar o usuário autenticado' })
   delete(@LoggedUser() user: User): Promise<User> {
     return this.userService.delete(user.id);
   }
 
-  @Patch("/update/:id")
-  @ApiOperation({ summary: 'Atualizar senha de qualquer usuário pelo Id. Acesso apenas ao ADMIN'})
+  @Patch(':id')
+  @ApiOperation({
+    summary:
+      'Atualizar senha de qualquer usuário pelo Id. Acesso apenas ao ADMIN',
+  })
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard(), RolesGuard)
   @ApiBearerAuth()
-  updateCredentials(@Param('id') user:User,@Body() updateCredentialsDto: UpdateCredentialsDto):Promise<User>{
-    return this.userService.updateCredentials(user.id,updateCredentialsDto)
+  updateCredentials(
+    @Param('id') user: string,
+    @Body() updateCredentialsDto: UpdateCredentialsDto,
+  ): Promise<User> {
+    return this.userService.updateCredentials(user, updateCredentialsDto);
   }
 }
