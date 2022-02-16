@@ -124,13 +124,15 @@ export class UserService {
 
     if (!hashValid) {
   
-      throw new ConflictException(`Senha incorreta, digite novamente. ${user.password}`);
+      throw new ConflictException(`Senha incorreta, digite novamente`);
     }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     const credentialsUpdated = await this.prismaService.user.update({
       where: { id: user.id },
       data: {
-        password: newPassword,
+        password: hashedPassword,
         role: role,
       },
     });
