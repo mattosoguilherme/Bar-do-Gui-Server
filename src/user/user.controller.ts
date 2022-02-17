@@ -58,7 +58,7 @@ export class UserController {
 
   @Delete()
   @ApiBearerAuth()
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.USER)
   @UseGuards(AuthGuard(), RolesGuard)
   @ApiOperation({ summary: 'Deletar o usuário autenticado' })
   delete(@LoggedUser() user: User): Promise<User> {

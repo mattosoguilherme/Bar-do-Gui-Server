@@ -3,7 +3,6 @@ import { Table, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Validator } from 'src/validation';
 import { CreateTableDto } from './dto/createTable.dto';
-import { UpdateUserTableDto } from './dto/updateUser.dto';
 
 @Injectable()
 export class TableService {
@@ -53,5 +52,4 @@ export class TableService {
 
     return tableFinded;
   }
-
 }
