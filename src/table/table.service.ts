@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Table, User } from '@prisma/client';
+import { Table } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Validator } from 'src/validation';
 import { CreateTableDto } from './dto/createTable.dto';

@@ -7,11 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  USER
-  ADMIN
-}
-
 model User {
   id       String   @id @default(uuid())
   name     String
@@ -19,9 +14,9 @@ model User {
   password String
   role     Role     @default(USER)
   createAt DateTime @default(now())
-  updateAt DateTime @updatedAt()
-  Table    Table?   @relation(fields: [tableId], references: [id])
+  updateAt DateTime @updatedAt
   tableId  String?
+  Table    Table?   @relation(fields: [tableId], references: [id])
 
   @@map("user")
 }
@@ -34,7 +29,7 @@ model Menu {
   description String
   price       Float
   createAt    DateTime @default(now())
-  updateAt    DateTime @updatedAt()
+  updateAt    DateTime @updatedAt
   tables      Order[]
 
   @@map("menu")
@@ -43,22 +38,27 @@ model Menu {
 model Table {
   id          String  @id @default(uuid())
   numberTable Int     @default(autoincrement())
-  product     Order[]
-  user        User[]
   observation String  @default("")
   total       Int     @default(0)
+  product     Order[]
+  user        User[]
 
   @@map("table")
 }
 
 model Order {
   id       String   @id @default(uuid())
-  Menu     Menu?    @relation(fields: [menuId], references: [id])
   menuId   String?
-  Table    Table?   @relation(fields: [tableId], references: [id])
   tableId  String?
   createAt DateTime @default(now())
-  updateAt DateTime @updatedAt()
+  updateAt DateTime @updatedAt
+  Menu     Menu?    @relation(fields: [menuId], references: [id])
+  Table    Table?   @relation(fields: [tableId], references: [id])
 
   @@map("order")
+}
+
+enum Role {
+  USER
+  ADMIN
 }
