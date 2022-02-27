@@ -62,7 +62,7 @@ export class Validator {
   async findTableId(id: string): Promise<Table> {
     const tableFinded = await this.prismaService.table.findUnique({
       where: { id: id },
-      include: {product:true}
+      include: {product:{ select: { Menu: true } }}
     });
 
     if (!tableFinded) {
