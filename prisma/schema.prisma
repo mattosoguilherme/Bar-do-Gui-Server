@@ -46,6 +46,7 @@ model Table {
   product     Order[]
   user        User[]
   observation String  @default("")
+  total       Int     @default(0)
 
   @@map("table")
 }
