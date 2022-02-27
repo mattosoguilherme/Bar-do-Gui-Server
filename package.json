@@ -1,13 +1,13 @@
 {
   "name": "backend",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "engines": {
     "node": "14.17.5"
   },
-  "description": "",
-  "author": "",
+  "description": "CRM - Service management",
+  "author": "Guilherme Mattoso",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
