@@ -40,6 +40,7 @@ export class TableService {
         product: { select: { Menu: true } },
         user: true,
         observation: true,
+        total:true,
         numberTable: true,
       },
     });
