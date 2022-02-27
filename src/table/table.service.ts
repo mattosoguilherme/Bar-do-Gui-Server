@@ -40,7 +40,7 @@ export class TableService {
         product: { select: { Menu: true } },
         user: true,
         observation: true,
-        total:true,
+        total: true,
         numberTable: true,
       },
     });
@@ -51,6 +51,21 @@ export class TableService {
   async findUnique(tableId: string): Promise<Table> {
     const tableFinded = await this.validator.findTableId(tableId);
 
-    return tableFinded;
+    var soma: number = 0;
+
+    for (let index = 0; index < tableFinded['product'].length; index++) {
+      soma += tableFinded['product'][index].Menu.price;
+    }
+
+    const updateTable = await this.prismaService.table.update({
+      where: { id: tableFinded.id },
+      data:{ 
+        observation: tableFinded.observation,
+        total:soma
+      },
+      include:{product: { select: { Menu: true } }}
+    });
+
+    return updateTable;
   }
 }

@@ -17,7 +17,6 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Role } from 'src/utils/roles.enum';
 import { CreateTableDto } from './dto/createTable.dto';
-import { UpdateUserTableDto } from './dto/updateUser.dto';
 import { TableService } from './table.service';
 
 @ApiTags('table')
