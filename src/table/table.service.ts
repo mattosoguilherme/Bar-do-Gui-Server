@@ -16,7 +16,7 @@ export class TableService {
 
     const createdTable = await this.prismaService.table.create({
       data: { observation: observation },
-      include: { product: { select: { Menu: true } }, user: true },
+      include: { order: { select: { Menu: true } }, user: true },
     });
 
     return createdTable;
@@ -27,7 +27,7 @@ export class TableService {
 
     const tableDeleted = await this.prismaService.table.delete({
       where: { id: tableId },
-      include: { product: { select: { Menu: true } } },
+      include: { order: { select: { Menu: true } } },
     });
 
     return tableDeleted;
@@ -37,7 +37,7 @@ export class TableService {
     const tableMany = await this.prismaService.table.findMany({
       select: {
         id: true,
-        product: { select: { Menu: true } },
+        order: { select: { Menu: true } },
         user: true,
         observation: true,
         total: true,
@@ -53,8 +53,8 @@ export class TableService {
 
     var soma: number = 0;
 
-    for (let index = 0; index < tableFinded['product'].length; index++) {
-      soma += tableFinded['product'][index].Menu.price;
+    for (let index = 0; index < tableFinded['order'].length; index++) {
+      soma += tableFinded['order'][index].Menu.price;
     }
 
     const updateTable = await this.prismaService.table.update({
@@ -63,7 +63,7 @@ export class TableService {
         observation: tableFinded.observation,
         total:soma
       },
-      include:{product: { select: { Menu: true } }}
+      include:{order: { select: { Menu: true } }}
     });
 
     return updateTable;

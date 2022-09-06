@@ -40,7 +40,7 @@ model Table {
   numberTable Int     @default(autoincrement())
   observation String  @default("")
   total       Int     @default(0)
-  product     Order[]
+  order       Order[]
   user        User[]
 
   @@map("table")

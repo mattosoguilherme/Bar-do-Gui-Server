@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
-import { Validator } from 'src/validation';
+import { BdgService } from 'src/bardogui.service';
 import { UpdateCredentialsDto } from './dto/updateCredentials.dto';
 import { Role } from 'src/utils/roles.enum';
 
@@ -13,44 +13,30 @@ import { Role } from 'src/utils/roles.enum';
 export class UserService {
   constructor(
     private prismaService: PrismaService,
-    private validator: Validator,
+    private bdgService: BdgService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const { password_sistem ,role ,email, password, passwordConfirmation } = createUserDto;
-
-    if (role === Role.ADMIN) {
-      if(password_sistem != process.env.PASSWORD_SISTEM){
-        throw new ConflictException('Senha do sistema está incorreta.')
-      }
-    }
-    await this.validator.validatingEmail(email);
-
-    if (password !== passwordConfirmation) {
-      throw new ConflictException('Senhas digitas não estão iguais.');
-    }
-
-    delete createUserDto.passwordConfirmation;
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    delete createUserDto.password_sistem;
+    const { role, email, password, name } =
+      await this.bdgService.fieldsValidator(createUserDto);
 
     const createdUser = await this.prismaService.user.create({
       data: {
-        ...createUserDto,
-        password: hashedPassword,
+        name: name,
+        email: email,
+        password: password,
+        role: role,
       },
       include: { Table: true },
     });
 
-    delete createUserDto.password;
+    delete createdUser.password;
 
     return createdUser;
   }
 
   async findMany(): Promise<UserDto[]> {
-    const users = await this.prismaService.user.findMany({
+    return await this.prismaService.user.findMany({
       select: {
         role: true,
         id: true,
@@ -60,29 +46,22 @@ export class UserService {
         updateAt: true,
       },
     });
-    return users;
   }
 
   async findUnique(userId: string): Promise<User> {
-    const userFinded = await this.validator.findUserId(userId);
+    const userFinded = await this.bdgService.findUserById(userId);
 
     delete userFinded.password;
+
     return userFinded;
   }
 
   async update(userId: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const { name, email } = updateUserDto;
+    const { name, email } = await this.bdgService.fieldsUpdateValidator(
+      updateUserDto,
+    );
 
-    await this.validator.findUserId(userId);
-
-    if (email) {
-      const emailExisting = await this.prismaService.user.findUnique({
-        where: { email: email },
-      });
-      if (emailExisting) {
-        throw new ConflictException('email já cadastrado');
-      }
-    }
+    await this.bdgService.findUserById(userId);
 
     const updatedUser = await this.prismaService.user.update({
       where: { id: userId },
@@ -101,38 +80,15 @@ export class UserService {
     userId: string,
     updateCredentials: UpdateCredentialsDto,
   ): Promise<User> {
-    const user = await this.validator.findUserId(userId);
-    const {
-      password_sistem,
-      role,
-      password,
-      newPassword,
-      newPasswordConfirmation,
-    } = updateCredentials;
-
-    if (role === Role.ADMIN) {
-      if(password_sistem != process.env.PASSWORD_SISTEM){
-        throw new ConflictException('Senha do sistema está incorreta.')
-      }
-    }
-
-    if (newPassword != newPasswordConfirmation) {
-      throw new ConflictException('Senhas não conferem.');
-    }
-
-    const hashValid = await bcrypt.compare(password,user.password)
-
-    if (!hashValid) {
-  
-      throw new ConflictException(`Senha incorreta, digite novamente`);
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
+    const { id } = await this.bdgService.findUserById(userId);
+    const { role, newPass } = await this.bdgService.credentialsValidator(
+      updateCredentials,
+      userId,
+    );
     const credentialsUpdated = await this.prismaService.user.update({
-      where: { id: user.id },
+      where: { id: id },
       data: {
-        password: hashedPassword,
+        password: newPass,
         role: role,
       },
     });
@@ -142,7 +98,7 @@ export class UserService {
   }
 
   async delete(userId: string): Promise<User> {
-    await this.validator.findUserId(userId);
+    await this.bdgService.findUserById(userId);
 
     const deletedUser = await this.prismaService.user.delete({
       where: { id: userId },
@@ -150,6 +106,7 @@ export class UserService {
     });
 
     delete deletedUser.password;
+
     return deletedUser;
   }
 }
