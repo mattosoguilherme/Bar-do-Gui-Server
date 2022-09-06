@@ -1,7 +1,8 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { Menu } from '@prisma/client';
+import { BdgService } from 'src/bardogui.service';
 import { PrismaService } from 'src/prisma.service';
-import { Validator } from 'src/validation';
+
 import { CreateMenuDto } from './dto/createMenu.dto';
 import { UpdateMenuDto } from './dto/updateMenu.dto';
 
@@ -9,7 +10,7 @@ import { UpdateMenuDto } from './dto/updateMenu.dto';
 export class MenuService {
   constructor(
     private prismaService: PrismaService,
-    private validator: Validator,
+    private bdgService: BdgService,
   ) {}
 
   async create(createMenuDto: CreateMenuDto): Promise<Menu> {
@@ -36,7 +37,7 @@ export class MenuService {
   async update(itemId: string, updateMenuDto: UpdateMenuDto): Promise<Menu> {
     const { title, imgUrl, product, description, price } = updateMenuDto;
 
-    await this.validator.findItemId(itemId);
+    await this.bdgService.findItemId(itemId);
 
     const updatedItem = await this.prismaService.menu.update({
       where: { id: itemId },
@@ -53,7 +54,7 @@ export class MenuService {
   }
 
   async delete(itemId: string): Promise<Menu> {
-    await this.validator.findItemId(itemId);
+    await this.bdgService.findItemId(itemId);
     const itemMany = await this.prismaService.order.findMany();
 
     itemMany.map((t) => {
@@ -72,7 +73,7 @@ export class MenuService {
   }
 
   async findUnique(itemId: string) {
-    const itemFinded = await this.validator.findItemId(itemId);
+    const itemFinded = await this.bdgService.findItemId(itemId);
 
     return itemFinded;
   }

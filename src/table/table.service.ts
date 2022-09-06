@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Table } from '@prisma/client';
+import { BdgService } from 'src/bardogui.service';
 import { PrismaService } from 'src/prisma.service';
-import { Validator } from 'src/validation';
+
 import { CreateTableDto } from './dto/createTable.dto';
 
 @Injectable()
 export class TableService {
   constructor(
     private prismaService: PrismaService,
-    private validator: Validator,
+    private bdgService: BdgService,
   ) {}
 
   async create(createTableDto: CreateTableDto): Promise<Table> {
@@ -23,7 +24,7 @@ export class TableService {
   }
 
   async delete(tableId: string): Promise<Table> {
-    await this.validator.findTableId(tableId);
+    await this.bdgService.findTableId(tableId);
 
     const tableDeleted = await this.prismaService.table.delete({
       where: { id: tableId },
@@ -49,7 +50,7 @@ export class TableService {
   }
 
   async findUnique(tableId: string): Promise<Table> {
-    const tableFinded = await this.validator.findTableId(tableId);
+    const tableFinded = await this.bdgService.findTableId(tableId);
 
     var soma: number = 0;
 

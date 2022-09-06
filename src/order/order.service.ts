@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Order } from '@prisma/client';
+import { BdgService } from 'src/bardogui.service';
 import { PrismaService } from 'src/prisma.service';
-import { Validator } from 'src/validation';
+
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 
@@ -9,7 +10,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 export class OrderService {
   constructor(
     private prismaService: PrismaService,
-    private validator: Validator,
+    private bdgService: BdgService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
@@ -29,12 +30,12 @@ export class OrderService {
   }
 
   async findOne(id: string): Promise<Order> {
-    const order = await this.validator.orderValid(id);
+    const order = await this.bdgService.orderValid(id);
     return order;
   }
 
   async update(id: string, updateOrderDto: UpdateOrderDto): Promise<Order> {
-    await this.validator.orderValid(id);
+    await this.bdgService.orderValid(id);
 
     const orderUpdated = await this.prismaService.order.update({
       where: { id: id },
@@ -46,7 +47,7 @@ export class OrderService {
   }
 
   async remove(id: string): Promise<Order> {
-    await this.validator.orderValid(id);
+    await this.bdgService.orderValid(id);
 
     const orderRemoved = await this.prismaService.order.delete({
       where: { id: id },
