@@ -1,13 +1,11 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto } from './dto/createUser.dto';
-import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { BdgService } from 'src/bardogui.service';
-import { UpdateCredentialsDto } from './dto/updateCredentials.dto';
-import { Role } from 'src/utils/roles.enum';
+
 
 @Injectable()
 export class UserService {
@@ -56,45 +54,25 @@ export class UserService {
     return userFinded;
   }
 
-  async update(userId: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const { name, email } = await this.bdgService.fieldsUpdateValidator(
-      updateUserDto,
-    );
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    await this.bdgService.findUserById(id);
 
-    await this.bdgService.findUserById(userId);
+    const { name, email, password, role } =
+      await this.bdgService.fieldsUpdateValidator(updateUserDto, id);
 
     const updatedUser = await this.prismaService.user.update({
-      where: { id: userId },
+      where: { id: id },
       data: {
         email: email,
         name: name,
+        password: password,
+        role: role,
       },
       include: { Table: true },
     });
 
     delete updatedUser.password;
     return updatedUser;
-  }
-
-  async updateCredentials(
-    userId: string,
-    updateCredentials: UpdateCredentialsDto,
-  ): Promise<User> {
-    const { id } = await this.bdgService.findUserById(userId);
-    const { role, newPass } = await this.bdgService.credentialsValidator(
-      updateCredentials,
-      userId,
-    );
-    const credentialsUpdated = await this.prismaService.user.update({
-      where: { id: id },
-      data: {
-        password: newPass,
-        role: role,
-      },
-    });
-
-    delete credentialsUpdated.password;
-    return credentialsUpdated;
   }
 
   async delete(userId: string): Promise<User> {

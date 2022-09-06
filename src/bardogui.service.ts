@@ -8,7 +8,6 @@ import { PrismaService } from './prisma.service';
 import { CreateUserDto } from './user/dto/createUser.dto';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './user/dto/updateUser.dto';
-import { UpdateCredentialsDto } from './user/dto/updateCredentials.dto';
 
 @Injectable()
 export class BdgService {
@@ -40,6 +39,9 @@ export class BdgService {
   //Funções assíncronas
   //*
 
+  // *
+  // Verificando se a senha é a mesma cadastrada no banco de dados
+  // *
   async compare(pass: string, id: string) {
     const user = await this.findUserById(id);
 
@@ -61,8 +63,7 @@ export class BdgService {
 
   // *
   // Buscando e validando componentes no banco de dados pelo seu atributo único
-  // *
-
+  //*
   async findUserById(id: string): Promise<User> {
     const user = await this.prismaService.user.findUnique({
       where: { id: id },
@@ -87,6 +88,33 @@ export class BdgService {
     return user;
   }
 
+  async findItemId(ItemId: string): Promise<Menu> {
+    const itemMenu = await this.prismaService.menu.findUnique({
+      where: { id: ItemId },
+    });
+
+    if (!itemMenu) {
+      throw new NotFoundException('Item do menu não encontrado');
+    }
+    return itemMenu;
+  }
+
+  async findTableById(id: string): Promise<Table> {
+    const tableFinded = await this.prismaService.table.findUnique({
+      where: { id: id },
+      include: {
+        order: { select: { Menu: true } },
+        user: { select: { name: true, id: true } },
+      },
+    });
+
+    if (!tableFinded) {
+      throw new NotFoundException('Mesa não encontrada.');
+    }
+
+    return tableFinded;
+  }
+
   async emailValid(email: string): Promise<User> {
     const emailValid = await this.prismaService.user.findUnique({
       where: { email: email },
@@ -100,6 +128,22 @@ export class BdgService {
 
     return emailValid;
   }
+
+  async orderValid(id: string): Promise<Order> {
+    const orderFinded = await this.prismaService.order.findUnique({
+      where: { id: id },
+      include: { Table: true, Menu: true },
+    });
+
+    if (!orderFinded.id) {
+      throw new NotFoundException('Pedido não encontrado');
+    }
+    return orderFinded;
+  }
+
+  // *
+  // Validando campos de acordo com as regras de negócio
+  // *
 
   async fieldsValidator({
     name,
@@ -125,44 +169,33 @@ export class BdgService {
     };
   }
 
-  async fieldsUpdateValidator({
-    name,
-    email,
-  }: UpdateUserDto): Promise<UpdateUserDto> {
-    const fieldUpated = {
-      name: name,
-      email: email,
-    };
-
-    if (email) {
-      await this.emailValid(email);
-    }
-    if (name) {
-      fieldUpated['name'] = this.titleize(name);
-    }
-
-    return fieldUpated;
-  }
-
-  async credentialsValidator(
+  async fieldsUpdateValidator(
     {
-      password_system,
-      role,
-      password,
+      name,
+      email,
+      actualPass,
       newPass,
       newPassConfirmation,
-    }: UpdateCredentialsDto,
+      password_system,
+      role,
+    }: UpdateUserDto,
     id: string,
-  ) {
-    const credentialsUpdated = {
-      newPass: '',
+  ): Promise<User> {
+    const fieldUpdated = {
+      name: '',
+      password: '',
+      email: '',
       role: role,
+      createAt: Date.prototype,
+      updateAt: Date.prototype,
+      tableId: '',
+      id: '',
     };
 
-    if (password) {
-      await this.compare(password, id);
+    if (actualPass) {
+      await this.compare(actualPass, id);
 
-      credentialsUpdated['newpass'] = await this.encryptor(
+      fieldUpdated['password'] = await this.encryptor(
         newPass,
         newPassConfirmation,
       );
@@ -172,42 +205,13 @@ export class BdgService {
       this.roleValidator(role, password_system);
     }
 
-    return credentialsUpdated;
-  }
-
-  async findItemId(ItemId: string): Promise<Menu> {
-    const itemMenu = await this.prismaService.menu.findUnique({
-      where: { id: ItemId },
-    });
-
-    if (!itemMenu) {
-      throw new NotFoundException('Item do menu não encontrado');
+    if (email) {
+      await this.emailValid(email);
     }
-    return itemMenu;
-  }
-
-  async findTableId(id: string): Promise<Table> {
-    const tableFinded = await this.prismaService.table.findUnique({
-      where: { id: id },
-      include: { order: { select: { Menu: true } } },
-    });
-
-    if (!tableFinded) {
-      throw new NotFoundException('Mesa não encontrada.');
+    if (name) {
+      fieldUpdated['name'] = this.titleize(name);
     }
 
-    return tableFinded;
-  }
-
-  async orderValid(id: string): Promise<Order> {
-    const orderFinded = await this.prismaService.order.findUnique({
-      where: { id: id },
-      include: { Table: true, Menu: true },
-    });
-
-    if (!orderFinded.id) {
-      throw new NotFoundException('Pedido não encontrado');
-    }
-    return orderFinded;
+    return fieldUpdated;
   }
 }

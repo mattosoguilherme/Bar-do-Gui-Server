@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Table } from '@prisma/client';
+import { Table, User } from '@prisma/client';
 import { BdgService } from 'src/bardogui.service';
 import { PrismaService } from 'src/prisma.service';
-
 import { CreateTableDto } from './dto/createTable.dto';
+import { UpdateTableDto } from './dto/updateTable.dto';
 
 @Injectable()
 export class TableService {
@@ -12,61 +12,83 @@ export class TableService {
     private bdgService: BdgService,
   ) {}
 
-  async create(createTableDto: CreateTableDto): Promise<Table> {
-    const { observation } = createTableDto;
+  async create(
+    { adult, kid, observation }: CreateTableDto,
+    { id }: User,
+  ): Promise<Table> {
+    return await this.prismaService.table.create({
+      data: {
+        observation: observation,
+        adult: adult,
+        kid: kid,
+        bill: 0,
+        total_client: adult + kid,
+        close: false,
+        user: { connect: { id: id } },
+      },
+      include: {
+        user: { select: { name: true, id: true } },
+      },
+    });
+  }
 
-    const createdTable = await this.prismaService.table.create({
-      data: { observation: observation },
+  async update({ adult, observation, kid }: UpdateTableDto, id: string) {
+    await this.bdgService.findTableById(id);
+
+    return await this.prismaService.table.update({
+      where: { id: id },
+      data: {
+        observation: observation,
+        adult: adult,
+        kid: kid,
+        bill: 0,
+        total_client: adult + kid,
+      },
       include: { order: { select: { Menu: true } }, user: true },
     });
+  }
 
-    return createdTable;
+  async close(id: string): Promise<Table> {
+    await this.bdgService.findTableById(id);
+    return await this.prismaService.table.update({
+      where: { id: id },
+      data: {
+        close: true,
+      },
+    });
   }
 
   async delete(tableId: string): Promise<Table> {
-    await this.bdgService.findTableId(tableId);
+    await this.bdgService.findTableById(tableId);
 
-    const tableDeleted = await this.prismaService.table.delete({
+    return await this.prismaService.table.delete({
       where: { id: tableId },
       include: { order: { select: { Menu: true } } },
     });
-
-    return tableDeleted;
   }
 
   async findMany(): Promise<Table[]> {
-    const tableMany = await this.prismaService.table.findMany({
+    return await this.prismaService.table.findMany({
       select: {
         id: true,
         order: { select: { Menu: true } },
-        user: true,
+        user: { select: { name: true, id: true } },
         observation: true,
-        total: true,
+        bill: true,
         numberTable: true,
+        adult: true,
+        kid: true,
+        close: true,
+        total_client: true,
+        createAt: true,
+        updateAt: true,
+        _count: true,
       },
+      where:{ close:false }
     });
-
-    return tableMany;
   }
 
-  async findUnique(tableId: string): Promise<Table> {
-    const tableFinded = await this.bdgService.findTableId(tableId);
-
-    var soma: number = 0;
-
-    for (let index = 0; index < tableFinded['order'].length; index++) {
-      soma += tableFinded['order'][index].Menu.price;
-    }
-
-    const updateTable = await this.prismaService.table.update({
-      where: { id: tableFinded.id },
-      data:{ 
-        observation: tableFinded.observation,
-        total:soma
-      },
-      include:{order: { select: { Menu: true } }}
-    });
-
-    return updateTable;
+  async findUnique(id: string): Promise<Table> {
+    return await this.bdgService.findTableById(id);
   }
 }

@@ -60,7 +60,7 @@ export class CreateUserDto {
   email: string;
 
   @ApiProperty({
-    default: '******',
+    default: '123456',
     description: 'senha do usuário',
   })
   @IsString({
@@ -80,7 +80,7 @@ export class CreateUserDto {
       'O campo passwordConfirmation deve ser obrigatoriamente uma string ',
   })
   @ApiProperty({
-    default: '******',
+    default: '123456',
     description: 'senha de confirmação do usuário',
   })
   @IsNotEmpty({

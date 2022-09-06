@@ -19,7 +19,6 @@ import { LoggedUser } from 'src/auth/decorators/loggedUser.decoretor';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/utils/roles.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { UpdateCredentialsDto } from './dto/updateCredentials.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -27,56 +26,51 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  @ApiOperation({ summary: 'cria um usuário' })
+  @ApiOperation({ summary: 'Criação de usuário.' })
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.userService.create(createUserDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar todos os usuários cadastrados' })
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
+  @ApiOperation({ summary: 'Listagem de todos os usuários cadastrados. Acesso restrito ao ADMIN' })
   findMany(): Promise<UserDto[]> {
     return this.userService.findMany();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'listar um usuário pelo ID' })
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
+  @ApiOperation({ summary: 'listagem de usuário pelo ID. Acesso restrito ao ADMIN' })
   findUnique(@Param('id') userId: string): Promise<User> {
     return this.userService.findUnique(userId);
   }
 
-  @Patch()
-  @Roles(Role.USER, Role.ADMIN)
+  @Patch(':id')
+  @Roles(Role.ADMIN)
   @ApiBearerAuth()
   @UseGuards(AuthGuard(), RolesGuard)
-  @ApiOperation({ summary: 'Atualializar o usuário autenticado' })
+  @ApiOperation({
+    summary: 'Atualização de cadastro do usuário. Acesso restrito ao ADMIN',
+  })
   update(
-    @LoggedUser() user: User,
+    @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
-    return this.userService.update(user.id, updateUserDto);
+    return this.userService.update(id, updateUserDto);
   }
 
-  @Delete()
+  @Delete(':id')
   @ApiBearerAuth()
-  @Roles(Role.ADMIN, Role.USER)
-  @UseGuards(AuthGuard(), RolesGuard)
-  @ApiOperation({ summary: 'Deletar o usuário autenticado' })
-  delete(@LoggedUser() user: User): Promise<User> {
-    return this.userService.delete(user.id);
-  }
-
-  @Patch(':id')
-  @ApiOperation({
-    summary:
-      'Atualizar senha de qualquer usuário pelo Id. Acesso apenas ao ADMIN',
-  })
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard(), RolesGuard)
-  @ApiBearerAuth()
-  updateCredentials(
-    @Param('id') user: string,
-    @Body() updateCredentialsDto: UpdateCredentialsDto,
-  ): Promise<User> {
-    return this.userService.updateCredentials(user, updateCredentialsDto);
+  @ApiOperation({
+    summary: 'Remoção do usuário autenticado. Acesso restrito ao ADMIN',
+  })
+  delete(@Param('id') id: string): Promise<User> {
+    return this.userService.delete(id);
   }
 }
