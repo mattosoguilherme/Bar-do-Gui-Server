@@ -14,15 +14,14 @@ export class MenuService {
   ) {}
 
   async create(createMenuDto: CreateMenuDto): Promise<Menu> {
-    const { description, product, title, imgUrl, price } = createMenuDto;
+    const { description, category, name, imgUrl, price } = createMenuDto;
 
     const createdMenu = await this.prismaService.menu.create({
       data: {
-        title: title,
+        name: name,
         imgUrl: imgUrl,
         price: price,
         description: description,
-        product: product,
       },
     });
 
@@ -35,16 +34,15 @@ export class MenuService {
   }
 
   async update(itemId: string, updateMenuDto: UpdateMenuDto): Promise<Menu> {
-    const { title, imgUrl, product, description, price } = updateMenuDto;
+    const { name, imgUrl, category, description, price } = updateMenuDto;
 
     await this.bdgService.findItemId(itemId);
 
     const updatedItem = await this.prismaService.menu.update({
       where: { id: itemId },
       data: {
-        title: title,
+        name: name,
         imgUrl: imgUrl,
-        product: product,
         description: description,
         price: price,
       },
