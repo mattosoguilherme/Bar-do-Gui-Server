@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Menu, Table, User, Order, Role } from '@prisma/client';
+import { Menu, Table, User, Order, Role, Category } from '@prisma/client';
 import { PrismaService } from './prisma.service';
 import { CreateUserDto } from './user/dto/createUser.dto';
 import * as bcrypt from 'bcrypt';
@@ -114,6 +114,17 @@ export class BdgService {
 
     return tableFinded;
   }
+  async findCategoryById(id: number): Promise<Category> {
+    const categoryFinded = await this.prismaService.category.findUnique({
+      where: { id: id },
+    });
+
+    if (!categoryFinded) {
+      throw new NotFoundException('Categoria não encontrada');
+    }
+
+    return categoryFinded;
+  }
 
   async emailValid(email: string): Promise<User> {
     const emailValid = await this.prismaService.user.findUnique({
@@ -139,6 +150,17 @@ export class BdgService {
       throw new NotFoundException('Pedido não encontrado');
     }
     return orderFinded;
+  }
+
+  // categoryValid verifica se a categoria já está cadastrada
+  async categoryValid(category: string) {
+    const s = await this.prismaService.category.findFirst({
+      where: { category: category },
+    });
+
+    if (s) {
+      throw new ConflictException('Categoria já cadastrada.');
+    }
   }
 
   // *

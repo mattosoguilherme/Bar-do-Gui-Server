@@ -22,15 +22,15 @@ model User {
 }
 
 model Menu {
-  id          String   @id @default(uuid())
-  title       String
+  id          String     @id @default(uuid())
+  name        String
   imgUrl      String
-  product     String
   description String
   price       Float
-  createAt    DateTime @default(now())
-  updateAt    DateTime @updatedAt
+  createAt    DateTime   @default(now())
+  updateAt    DateTime   @updatedAt
   tables      Order[]
+  Category    Category[]
 
   @@map("menu")
 }
@@ -62,6 +62,14 @@ model Order {
   Table    Table?   @relation(fields: [tableId], references: [id])
 
   @@map("order")
+}
+
+model Category {
+  id       Int    @id @default(autoincrement())
+  category String
+  Menu     Menu[]
+
+  @@map("category")
 }
 
 enum Role {

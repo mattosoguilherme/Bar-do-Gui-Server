@@ -1,36 +1,20 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl } from "class-validator";
+import { PartialType } from '@nestjs/swagger';
+import { IsOptional } from 'class-validator';
+import { CreateMenuDto } from './createMenu.dto';
 
-export class UpdateMenuDto {
+export class UpdateMenuDto extends PartialType(CreateMenuDto) {
+  @IsOptional()
+  name?: string;
 
+  @IsOptional()
+  imgUrl?: string;
 
-    @IsOptional()
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    title:string;
+  @IsOptional()
+  category?: number;
 
-    @ApiProperty()
-    @IsOptional()
-    @IsString()
-    @IsNotEmpty()
-    imgUrl: string;
+  @IsOptional()
+  description?: string;
 
-    @ApiProperty()
-    @IsOptional()
-    @IsString()
-    @IsNotEmpty()
-    product:string;
-
-    @ApiProperty()
-    @IsOptional()
-    @IsString()
-    @IsNotEmpty()
-    description:string;
-
-    @IsOptional()
-    @IsNumber()
-    @ApiProperty()
-    @IsNotEmpty()
-    price:number;
+  @IsOptional()
+  price?: number;
 }
