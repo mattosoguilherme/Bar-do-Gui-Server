@@ -88,7 +88,7 @@ export class BdgService {
     return user;
   }
 
-  async findItemId(ItemId: string): Promise<Menu> {
+  async findItemById(ItemId: string): Promise<Menu> {
     const itemMenu = await this.prismaService.menu.findUnique({
       where: { id: ItemId },
     });
@@ -167,6 +167,9 @@ export class BdgService {
   // Validando campos de acordo com as regras de negócio
   // *
 
+
+
+
   async fieldsValidator({
     name,
     password,
@@ -235,5 +238,21 @@ export class BdgService {
     }
 
     return fieldUpdated;
+  }
+
+    //*
+  //Função checkingIfOrdered verifica se o item está em algum pedido
+  //*
+  async checkingIfOrdered(id:string){
+    const itemMany = await this.prismaService.order.findMany();
+
+    itemMany.map((t) => {
+      if (id === t.menuId) {
+        throw new ConflictException(
+          'Não é possível apagar item do menu, pois, alguma mesa está aguardando o mesmo',
+        );
+      }
+    });
+
   }
 }

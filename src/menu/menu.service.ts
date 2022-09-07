@@ -16,63 +16,51 @@ export class MenuService {
   async create(createMenuDto: CreateMenuDto): Promise<Menu> {
     const { description, category, name, imgUrl, price } = createMenuDto;
 
-    const createdMenu = await this.prismaService.menu.create({
+    await this.bdgService.findCategoryById(category);
+
+    return await this.prismaService.menu.create({
       data: {
         name: name,
         imgUrl: imgUrl,
         price: price,
         description: description,
+        Category: { connect: { id: category } },
       },
     });
-
-    return createdMenu;
   }
 
-  async findMany() {
-    const menu = await this.prismaService.menu.findMany();
-    return menu;
+  async findMany(): Promise<Menu[]> {
+    return await this.prismaService.menu.findMany();
   }
 
-  async update(itemId: string, updateMenuDto: UpdateMenuDto): Promise<Menu> {
+  async update(id: string, updateMenuDto: UpdateMenuDto): Promise<Menu> {
     const { name, imgUrl, category, description, price } = updateMenuDto;
 
-    await this.bdgService.findItemId(itemId);
+    await this.bdgService.findCategoryById(category);
+    await this.bdgService.findItemById(id);
 
-    const updatedItem = await this.prismaService.menu.update({
-      where: { id: itemId },
+    return await this.prismaService.menu.update({
+      where: { id: id },
       data: {
         name: name,
         imgUrl: imgUrl,
         description: description,
         price: price,
+        Category: { connect: { id: category } },
       },
     });
-
-    return updatedItem;
   }
 
-  async delete(itemId: string): Promise<Menu> {
-    await this.bdgService.findItemId(itemId);
-    const itemMany = await this.prismaService.order.findMany();
+  async delete(id: string): Promise<Menu> {
+    await this.bdgService.findItemById(id);
+    await this.bdgService.checkingIfOrdered(id);
 
-    itemMany.map((t) => {
-      if(itemId === t.menuId) {
-        throw new ConflictException(
-          'Não é possivel apagar item do menu, pois, alguma mesa está aguardando o mesmo',
-        );
-      }
+    return await this.prismaService.menu.delete({
+      where: { id: id },
     });
-
-    const deleteItemMenu = await this.prismaService.menu.delete({
-      where: { id: itemId },
-    });
-    
-    return deleteItemMenu;
   }
 
-  async findUnique(itemId: string) {
-    const itemFinded = await this.bdgService.findItemId(itemId);
-
-    return itemFinded;
+  async findUnique(id: string): Promise<Menu> {
+    return await this.bdgService.findItemById(id);
   }
 }
