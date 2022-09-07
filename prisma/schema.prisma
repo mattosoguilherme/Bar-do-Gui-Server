@@ -53,13 +53,14 @@ model Table {
 }
 
 model Order {
-  id       String   @id @default(uuid())
-  menuId   String?
-  tableId  String?
-  createAt DateTime @default(now())
-  updateAt DateTime @updatedAt
-  Menu     Menu?    @relation(fields: [menuId], references: [id])
-  Table    Table?   @relation(fields: [tableId], references: [id])
+  id          String   @id @default(uuid())
+  menuId      String?
+  tableId     String?
+  observation String  @default("")
+  createAt    DateTime @default(now())
+  updateAt    DateTime @updatedAt
+  Menu        Menu?    @relation(fields: [menuId], references: [id])
+  Table       Table?   @relation(fields: [tableId], references: [id])
 
   @@map("order")
 }

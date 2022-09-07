@@ -1,16 +1,14 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { PartialType } from '@nestjs/swagger';
+import { IsOptional } from 'class-validator';
+import { CreateOrderDto } from './create-order.dto';
 
-export class UpdateOrderDto {
-  @ApiProperty()
+export class UpdateOrderDto extends PartialType(CreateOrderDto) {
   @IsOptional()
-  @IsNotEmpty()
-  @IsString()
-  tableId: string;
+  observation?: string;
 
-  @ApiProperty()
   @IsOptional()
-  @IsNotEmpty()
-  @IsString()
-  menuId: string;
+  tableId?: string;
+
+  @IsOptional()
+  menuId?: string;
 }

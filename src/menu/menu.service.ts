@@ -35,9 +35,22 @@ export class MenuService {
 
   async update(id: string, updateMenuDto: UpdateMenuDto): Promise<Menu> {
     const { name, imgUrl, category, description, price } = updateMenuDto;
-
-    await this.bdgService.findCategoryById(category);
     await this.bdgService.findItemById(id);
+    
+    if (category) {
+      await this.bdgService.findCategoryById(category);
+
+      return await this.prismaService.menu.update({
+        where: { id: id },
+        data: {
+          name: name,
+          imgUrl: imgUrl,
+          description: description,
+          price: price,
+          Category: { connect: { id: category } },
+        },
+      });
+    }
 
     return await this.prismaService.menu.update({
       where: { id: id },
@@ -46,7 +59,6 @@ export class MenuService {
         imgUrl: imgUrl,
         description: description,
         price: price,
-        Category: { connect: { id: category } },
       },
     });
   }
