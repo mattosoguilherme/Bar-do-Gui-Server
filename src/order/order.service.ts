@@ -13,11 +13,28 @@ export class OrderService {
     private bdgService: BdgService,
   ) {}
 
-  async create(createOrderDto: CreateOrderDto): Promise<Order> {
-   
-   
+  async create({
+    menuId,
+    tableId,
+    observation,
+  }: CreateOrderDto): Promise<Order> {
+    const table = await this.bdgService.findTableById(tableId);
+    const { price } = await this.bdgService.findItemById(menuId);
+
+    await this.prismaService.table.update({
+      where: { id: tableId },
+      data: {
+        ...table,
+        bill: table.bill + price,
+      },
+    });
+
     const createdOrder = await this.prismaService.order.create({
-      data: createOrderDto,
+      data: {
+        Table: { connect: { id: tableId } },
+        Menu: { connect: { id: menuId } },
+        observation:observation
+      },
       include: { Table: true, Menu: true },
     });
     return createdOrder;
