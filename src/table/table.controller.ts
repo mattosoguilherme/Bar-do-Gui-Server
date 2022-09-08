@@ -45,7 +45,7 @@ export class TableController {
     return this.tableService.delete(tableId);
   }
 
-  @Patch(':id')
+  @Patch('/table/:id')
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
   @UseGuards(AuthGuard(), RolesGuard)
