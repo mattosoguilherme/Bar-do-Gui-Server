@@ -23,12 +23,12 @@ model User {
 
 model Menu {
   id          String     @id @default(uuid())
-  name        String
   imgUrl      String
   description String
   price       Float
   createAt    DateTime   @default(now())
   updateAt    DateTime   @updatedAt
+  name        String
   tables      Order[]
   Category    Category[]
 
@@ -38,16 +38,16 @@ model Menu {
 model Table {
   id           String   @id @default(uuid())
   numberTable  Int      @default(autoincrement())
-  adult        Int      @default(0)
-  kid          Int      @default(0)
   observation  String   @default("")
+  adult        Int      @default(0)
+  bill         Float  @default(0)
+  createAt     DateTime @default(now())
+  kid          Int      @default(0)
   total_client Int      @default(0)
-  bill         Int      @default(0)
+  updateAt     DateTime @updatedAt
+  close        Boolean  @default(false)
   order        Order[]
   user         User[]
-  close        Boolean  @default(false)
-  createAt     DateTime @default(now())
-  updateAt     DateTime @updatedAt
 
   @@map("table")
 }
@@ -56,9 +56,9 @@ model Order {
   id          String   @id @default(uuid())
   menuId      String?
   tableId     String?
-  observation String  @default("")
   createAt    DateTime @default(now())
   updateAt    DateTime @updatedAt
+  observation String   @default("")
   Menu        Menu?    @relation(fields: [menuId], references: [id])
   Table       Table?   @relation(fields: [tableId], references: [id])
 

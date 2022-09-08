@@ -39,9 +39,26 @@ export class BdgService {
   //Funções assíncronas
   //*
 
-  // *
+  async addBill({ id, bill }: Table, cash: number) {
+    await this.prismaService.table.update({
+      where: { id: id },
+      data: {
+        bill: cash + bill,
+      },
+    });
+  }
+
+  async subBill({ id, bill }: Table, cash: number) {
+    await this.prismaService.table.update({
+      where: { id: id },
+      data: {
+        bill: cash - bill,
+      },
+    });
+  }
+
+
   // Verificando se a senha é a mesma cadastrada no banco de dados
-  // *
   async compare(pass: string, id: string) {
     const user = await this.findUserById(id);
 
@@ -167,9 +184,6 @@ export class BdgService {
   // Validando campos de acordo com as regras de negócio
   // *
 
-
-
-
   async fieldsValidator({
     name,
     password,
@@ -240,10 +254,10 @@ export class BdgService {
     return fieldUpdated;
   }
 
-    //*
+  //*
   //Função checkingIfOrdered verifica se o item está em algum pedido
   //*
-  async checkingIfOrdered(id:string){
+  async checkingIfOrdered(id: string) {
     const itemMany = await this.prismaService.order.findMany();
 
     itemMany.map((t) => {
@@ -253,6 +267,5 @@ export class BdgService {
         );
       }
     });
-
   }
 }
