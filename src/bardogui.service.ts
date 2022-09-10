@@ -35,6 +35,24 @@ export class BdgService {
     return n.replace(/,/g, ' ');
   }
 
+  reportGenerator(tables: Table[]) {
+    const report = {
+      winnings: 0,
+      peoples: 0,
+      adults: 0,
+      kids: 0,
+    };
+
+    for (let index = 0; index < tables.length; index++) {
+      report['winnings'] += tables[index].bill;
+      report['peoples'] += tables[index].total_client;
+      report['adults'] += tables[index].adult;
+      report['kids'] += tables[index].kid;
+    }
+
+    return report;
+  }
+
   //*
   //Funções assíncronas
   //*
@@ -56,7 +74,6 @@ export class BdgService {
       },
     });
   }
-
 
   // Verificando se a senha é a mesma cadastrada no banco de dados
   async compare(pass: string, id: string) {

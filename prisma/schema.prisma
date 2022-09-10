@@ -40,7 +40,7 @@ model Table {
   numberTable  Int      @default(autoincrement())
   observation  String   @default("")
   adult        Int      @default(0)
-  bill         Float  @default(0)
+  bill         Float    @default(0)
   createAt     DateTime @default(now())
   kid          Int      @default(0)
   total_client Int      @default(0)

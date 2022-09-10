@@ -5,9 +5,10 @@ import { AuthModule } from './auth/auth.module';
 import { TableModule } from './table/table.module';
 import { OrderModule } from './order/order.module';
 import { CategoryModule } from './category/category.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
-  imports: [UserModule, TableModule, MenuModule, AuthModule, OrderModule, CategoryModule],
+  imports: [UserModule, TableModule, MenuModule, AuthModule, OrderModule, CategoryModule, DashboardModule],
   controllers: [],
   providers: [],
 })
