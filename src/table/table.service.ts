@@ -24,10 +24,10 @@ export class TableService {
         bill: 0,
         total_client: adult + kid,
         close: false,
-        user: { connect: { id: id } },
+        User: { connect: { id: id } },
       },
       include: {
-        user: { select: { name: true, id: true } },
+        User: { select: { name: true, id: true } },
       },
     });
   }
@@ -44,7 +44,16 @@ export class TableService {
         bill: 0,
         total_client: adult + kid,
       },
-      include: { order: { select: { Menu: true } }, user: true },
+      include: {
+        order: {
+          select: {
+            Menu: {
+              select: { name: true, imgUrl: true, id: true, price: true },
+            },
+          },
+        },
+        User: { select: { id: true, name: true, role: true } },
+      },
     });
   }
 
@@ -69,22 +78,17 @@ export class TableService {
 
   async findMany(): Promise<Table[]> {
     return await this.prismaService.table.findMany({
-      select: {
-        id: true,
-        order: { select: { Menu: true } },
-        user: { select: { name: true, id: true } },
-        observation: true,
-        bill: true,
-        numberTable: true,
-        adult: true,
-        kid: true,
-        close: true,
-        total_client: true,
-        createAt: true,
-        updateAt: true,
-        _count: true,
+      where: { close: false },
+      include: {
+        order: {
+          include: {
+            Menu: {
+              select: { name: true, imgUrl: true, id: true, price: true },
+            },
+          },
+        },
+        User: { select: { id: true, role: true, name: true } },
       },
-      where:{ close:false }
     });
   }
 

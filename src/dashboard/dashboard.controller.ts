@@ -26,4 +26,12 @@ export class DashboardController {
   monthReport(@Body() searchMonth: MonthReportDto) {
     return this.dashboardService.monthReport(searchMonth);
   }
+
+  @Get(':idUser')
+  @ApiOperation({
+    summary: 'Puxa relatório do usuário',
+  })
+  userReport(@Param('idUser') idUser: string) {
+    return this.dashboardService.userReport(idUser);
+  }
 }

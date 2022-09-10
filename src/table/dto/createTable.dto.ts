@@ -2,9 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateTableDto {
-  @IsNotEmpty({
-    message: 'Campo observation é obrigatório',
-  })
+
   @IsString({
     message: 'O campo observation deve ser obrigatoriamente uma string ',
   })

@@ -19,17 +19,25 @@ export class DashboardService {
     return this.bdgService.reportGenerator(tables);
   }
 
-  async monthReport({monthToSearch}: MonthReportDto) {
+  async monthReport({ monthToSearch }: MonthReportDto) {
     const tables = (await this.prisma.table.findMany()).filter((t) => {
       const dateCreation = t.createAt.toISOString().slice(5, 7);
 
-
-
       console.log(dateCreation);
-      
+
       if (dateCreation === monthToSearch) return t;
     });
 
     return this.bdgService.reportGenerator(tables);
+  }
+
+  async userReport(idUser: string) {
+    await this.bdgService.findUserById(idUser);
+
+    const userTables = await this.prisma.table.findMany();
+
+    console.log(userTables);
+
+    return this.bdgService.reportGenerator(userTables);
   }
 }

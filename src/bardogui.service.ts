@@ -138,7 +138,7 @@ export class BdgService {
       where: { id: id },
       include: {
         order: { select: { Menu: true } },
-        user: { select: { name: true, id: true } },
+        User: { select: { id: true, name: true, role: true } },
       },
     });
 
@@ -220,7 +220,6 @@ export class BdgService {
       role: role,
       createAt: Date.prototype,
       updateAt: Date.prototype,
-      tableId: '',
       id: '',
     };
   }
