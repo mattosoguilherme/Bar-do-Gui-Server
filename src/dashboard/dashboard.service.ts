@@ -34,7 +34,9 @@ export class DashboardService {
   async userReport(idUser: string) {
     await this.bdgService.findUserById(idUser);
 
-    const userTables = await this.prisma.table.findMany();
+    const userTables = await this.prisma.table.findMany({
+      where: { userId: idUser },
+    });
 
     console.log(userTables);
 

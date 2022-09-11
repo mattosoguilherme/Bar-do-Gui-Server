@@ -82,12 +82,11 @@ export class TableService {
       include: {
         order: {
           include: {
-            Menu: {
-              select: { name: true, imgUrl: true, id: true, price: true },
-            },
+            Menu: true,
           },
         },
         User: { select: { id: true, role: true, name: true } },
+        
       },
     });
   }
