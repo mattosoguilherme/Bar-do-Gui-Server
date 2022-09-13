@@ -6,7 +6,6 @@ import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { BdgService } from 'src/bardogui.service';
 
-
 @Injectable()
 export class UserService {
   constructor(
@@ -57,6 +56,13 @@ export class UserService {
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     await this.bdgService.findUserById(id);
 
+    if (updateUserDto.role) {
+      this.bdgService.roleValidator(
+        updateUserDto.role,
+        updateUserDto.password_system,
+      );
+    }
+
     const { name, email, password, role } =
       await this.bdgService.fieldsUpdateValidator(updateUserDto, id);
 
@@ -70,7 +76,6 @@ export class UserService {
       },
       include: { Table: true },
     });
-
     delete updatedUser.password;
     return updatedUser;
   }

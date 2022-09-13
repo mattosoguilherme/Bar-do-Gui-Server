@@ -3,6 +3,8 @@ import { IsDateString } from 'class-validator';
 
 export class DateReportDto {
   @IsDateString()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Data de busca para gerar relatório referente ao fluxo diário',
+  })
   dateToSearch: Date;
 }

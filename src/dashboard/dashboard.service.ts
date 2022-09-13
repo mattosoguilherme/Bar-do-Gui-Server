@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { BdgService } from 'src/bardogui.service';
 import { PrismaService } from 'src/prisma.service';
+import { DailyUserReportDto } from './dto/dailyUserReport.dto';
 import { DateReportDto } from './dto/dateReport.dto';
+import { MonthlyUserReportDto } from './dto/monthlyUserReport.dto';
 import { MonthReportDto } from './dto/monthReport.dto';
 
 @Injectable()
@@ -23,8 +25,6 @@ export class DashboardService {
     const tables = (await this.prisma.table.findMany()).filter((t) => {
       const dateCreation = t.createAt.toISOString().slice(5, 7);
 
-      console.log(dateCreation);
-
       if (dateCreation === monthToSearch) return t;
     });
 
@@ -38,8 +38,40 @@ export class DashboardService {
       where: { userId: idUser },
     });
 
-    console.log(userTables);
-
     return this.bdgService.reportGenerator(userTables);
+  }
+
+  async monthlyUerReport({ idUser, monthToSearch }: MonthlyUserReportDto) {
+    const tables = (
+      await this.prisma.table.findMany({
+        where: {
+          userId: idUser,
+        },
+      })
+    ).filter((t) => {
+      const dateCreation = t.createAt.toISOString().slice(5, 7);
+
+      if (dateCreation === monthToSearch) return t;
+    });
+
+    return this.bdgService.reportGenerator(tables);
+  }
+
+  async dailyUerReport({ idUser, dateToSearch }: DailyUserReportDto) {
+    const daySearch = String(dateToSearch).slice(0, 10);
+
+    const tables = (
+      await this.prisma.table.findMany({
+        where: {
+          userId: idUser,
+        },
+      })
+    ).filter((t) => {
+      const dateCreation = t.createAt.toISOString().slice(0, 10);
+
+      if (dateCreation === daySearch) return t;
+    });
+
+    return this.bdgService.reportGenerator(tables);
   }
 }

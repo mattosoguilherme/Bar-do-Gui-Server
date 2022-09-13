@@ -15,6 +15,11 @@ export class BdgService {
 
   //Funções síncronas
 
+  percent(all: number, part: number) {
+    return Math.round((part * 100) / all);
+  }
+
+  //Função roleValidator confere se a senha do sistema está correta
   roleValidator(role: Role, password_system: string) {
     if (role === Role.ADMIN) {
       if (password_system != process.env.PASSWORD_SISTEM) {
@@ -24,6 +29,8 @@ export class BdgService {
 
     return role;
   }
+
+  //Função titleize deixa a primeira letra maiúscula de cada palavra numa string
   titleize(text: string) {
     var words = text.toLowerCase().split(' ');
 
@@ -35,21 +42,32 @@ export class BdgService {
     return n.replace(/,/g, ' ');
   }
 
+  // Função reportGenerator gera um relatório de total de lucros, pessoas atendidas (adulto e crianças) e também o total de mesas.
   reportGenerator(tables: Table[]) {
     const report = {
-      winnings: 0,
-      peoples: 0,
+      total_profits: 0,
+      total_number_of_customers_served: 0,
       adults: 0,
       kids: 0,
+      tables: tables.length,
     };
 
     for (let index = 0; index < tables.length; index++) {
-      report['winnings'] += tables[index].bill;
-      report['peoples'] += tables[index].total_client;
+      report['total_profits'] += tables[index].bill;
+      report['total_number_of_customers_served'] += tables[index].total_client;
       report['adults'] += tables[index].adult;
       report['kids'] += tables[index].kid;
     }
 
+    report['total_profits'] = Math.round(report.total_profits);
+    report['percentage_of_adults'] = this.percent(
+      report.total_number_of_customers_served,
+      report.adults,
+    );
+    report['percentage_of_kids'] = this.percent(
+      report.total_number_of_customers_served,
+      report.kids,
+    );
     return report;
   }
 
@@ -57,6 +75,7 @@ export class BdgService {
   //Funções assíncronas
   //*
 
+  //Função addBill adiciona valor a comanda e função subBill subtrai valores da comanda
   async addBill({ id, bill }: Table, cash: number) {
     await this.prismaService.table.update({
       where: { id: id },
@@ -75,7 +94,7 @@ export class BdgService {
     });
   }
 
-  // Verificando se a senha é a mesma cadastrada no banco de dados
+  // Função compare verifica se a senha é a mesma que está cadastrada no banco de dados
   async compare(pass: string, id: string) {
     const user = await this.findUserById(id);
 
@@ -88,6 +107,7 @@ export class BdgService {
     return;
   }
 
+  //Função encryptor criptógrafa a senha(string) cadastrada pelo usuário
   async encryptor(pass: string, passConfirmation: string) {
     if (pass != passConfirmation) {
       throw new ConflictException('Senhas não conferem.');
@@ -180,19 +200,18 @@ export class BdgService {
       include: { Table: true, Menu: true },
     });
 
-    if (!orderFinded.id) {
+    if (!orderFinded) {
       throw new NotFoundException('Pedido não encontrado');
     }
     return orderFinded;
   }
 
-  // categoryValid verifica se a categoria já está cadastrada
   async categoryValid(category: string) {
-    const s = await this.prismaService.category.findFirst({
+    const c = await this.prismaService.category.findFirst({
       where: { category: category },
     });
 
-    if (s) {
+    if (c) {
       throw new ConflictException('Categoria já cadastrada.');
     }
   }
@@ -231,7 +250,6 @@ export class BdgService {
       actualPass,
       newPass,
       newPassConfirmation,
-      password_system,
       role,
     }: UpdateUserDto,
     id: string,
@@ -254,10 +272,6 @@ export class BdgService {
         newPass,
         newPassConfirmation,
       );
-    }
-
-    if (role) {
-      this.roleValidator(role, password_system);
     }
 
     if (email) {
