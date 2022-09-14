@@ -27,7 +27,7 @@
     "pull": "npx prisma db pull",
     "studio": "npx prisma studio",
     "generate": "npx prisma generate",
-    "heroku-postbuild": "npm install --only=dev --no-shrinkwrap  && npm run generate && npm run build"
+    "heroku-postbuild": "npm install --only=dev --no-shrinkwrap && npm run build"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
