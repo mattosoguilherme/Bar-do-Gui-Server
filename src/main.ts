@@ -24,6 +24,8 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
   await app.listen(process.env.PORT || port, () => {
     console.log(`Rodando neste endereço: http://localhost:${port}/api`);
+
+
   });
 }
 bootstrap();

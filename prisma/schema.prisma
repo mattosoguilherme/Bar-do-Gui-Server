@@ -45,9 +45,9 @@ model Table {
   total_client Int      @default(0)
   updateAt     DateTime @updatedAt
   close        Boolean  @default(false)
-  order        Order[]
-  User         User?    @relation(fields: [userId], references: [id])
   userId       String?
+  User         User?    @relation(fields: [userId], references: [id])
+  order        Order[]
 
   @@map("table")
 }
