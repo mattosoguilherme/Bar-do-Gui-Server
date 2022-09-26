@@ -1,5 +1,9 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Role } from 'src/utils/roles.enum';
 import { DashboardService } from './dashboard.service';
 import { DailyUserReportDto } from './dto/dailyUserReport.dto';
 import { DateReportDto } from './dto/dateReport.dto';
@@ -12,6 +16,9 @@ export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
   @Post('/dayReport')
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
   @ApiOperation({
     summary:
       'Gera relatório diário de total de lucros e fluxo  clientes no restaurante',
@@ -21,6 +28,9 @@ export class DashboardController {
   }
 
   @Post('/monthReport')
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
   @ApiOperation({
     summary:
       'Gera relatório mensal de total de lucros e fluxo  clientes no restaurante',
@@ -30,6 +40,9 @@ export class DashboardController {
   }
 
   @Post('/monthlyUserReport')
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
   @ApiOperation({
     summary:
       'Gera relatório mensal do usuário de total de lucros e fluxo  clientes no restaurante',
@@ -39,6 +52,9 @@ export class DashboardController {
   }
 
   @Post('/dailyUserReport')
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
   @ApiOperation({
     summary:
       'Gera relatório diário do usuário de total de lucros e fluxo  clientes no restaurante',
@@ -48,6 +64,9 @@ export class DashboardController {
   }
 
   @Get(':idUser')
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
   @ApiOperation({
     summary: 'Gera relatório do usuário',
   })
